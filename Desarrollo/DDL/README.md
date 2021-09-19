@@ -2,17 +2,17 @@
 
 modelo.sql   ---> contiene el esquema de tablas necesario con sus relaciones
 storeprocedures.sql ---> contiene los siguientes SP:
-                    alta_cc = alta del centro de costo
-                    alta_cf = alta del centro de facturacion
-                    alta_cliente = alta de cliente
-                    alta_empleado = alta de empleado
-                    alta_proyecto = alta de proyecto
-                    alta_rol = alta de roles
-                    alta_tarea = alta de tareas
-                    liquidacion_mensual = genera liquidacion mensual
-                    rendicion_horas_diaria = genera la rendicion diaria de horas para empleados de rendicion diaria
-
-
-
+<ol>
+<li>alta_cc = alta del centro de costo</li>
+<li>alta_cf = alta del centro de facturacion</li>
+<li>alta_cliente = alta de cliente</li>
+<li>alta_empleado = alta de empleado</li>
+<li>alta_proyecto = alta de proyecto</li>
+<li>alta_rol = alta de roles</li>
+<li>alta_tarea = alta de tareas</li>
+<li>liquidacion_mensual = genera liquidacion mensual</li>
+<li>rendicion_horas_diaria = genera la rendicion diaria de horas para empleados de rendicion diaria</li>
+</ol>
+                    
 ### Modelo Relacional
-![Modelo Relacional](Desarrollo/Assets/rendicionhoras.jpg)
+![Modelo Relacional](../Desarrollo/Assets/rendicionhoras.jpg)
