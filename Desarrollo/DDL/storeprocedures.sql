@@ -43,7 +43,9 @@ begin
     INSERT INTO roles(descripcion_rol) values (in_descripcion_rol);
 end;
 
-create definer = root@localhost procedure alta_tarea(IN in_descripcion varchar(255), IN in_legajo int, IN in_estado char, IN in_proyecto_id int)
+create
+    definer = root@localhost procedure alta_tarea(IN in_descripcion varchar(255), IN in_legajo int, IN in_estado char,
+                                                  IN in_proyecto_id int)
 begin
     INSERT INTO tareas
         (descripcion, legajo_id, estado, proyecto_id, fini)
