@@ -89,3 +89,35 @@ begin
     end if;
     
 end;
+create
+    definer = root@localhost procedure ajuste_horas(IN in_horas decimal(5, 2), IN in_id_rendicion int)
+begin
+    SET  @valoractual  = (select horas from rendicion where id=in_id_rendicion);
+    SET  @mesrendicion  = (select MONTH(fecharendicion) from rendicion where id=in_id_rendicion);
+    SET  @cliente_liq  = (select c.id from rendicion r
+                            join tarea_rendicion tr on r.id = tr.id_rendicion
+                            join tareas t on t.id = r.tarea_id join empleado e on e.legajo = t.legajo_id
+                            join proyecto p on p.proyecto_id = t.proyecto_id join cliente c on c.id = p.cliente_id
+                            where r.id= in_id_rendicion);
+    SET  @proyecto_liq  = (select t.proyecto_id from rendicion r
+                            join tarea_rendicion tr on r.id = tr.id_rendicion
+                            join tareas t on t.id = r.tarea_id
+                            where r.id=in_id_rendicion);
+    SET  @mesliquidacion  = (select MONTH(fecha) from liquidacion_mensual where cliente_id=@cliente_liq  and proyecto_id =@proyecto_liq  );
+    SET @horasliqmensualactual = (select horas from liquidacion_mensual where cliente_id=@cliente_liq and proyecto_id =@proyecto_liq);
+    IF in_horas > @valoractual then
+        IF @mesrendicion = @mesliquidacion then
+            UPDATE liquidacion_mensual
+                    SET horas = (@horasliqmensualactual+in_horas)
+            WHERE cliente_id=@cliente_liq and proyecto_id=@proyecto_liq;
+        end if;
+    else
+        IF @mesrendicion = @mesliquidacion then
+            UPDATE liquidacion_mensual
+                    SET horas = (@horasliqmensualactual-in_horas)
+            WHERE cliente_id=@cliente_liq and proyecto_id=@proyecto_liq;
+        end if;
+    end if;
+    UPDATE rendicion set horas = in_horas
+        WHERE id=in_id_rendicion;
+end;

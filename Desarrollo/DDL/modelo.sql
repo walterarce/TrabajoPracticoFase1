@@ -1,18 +1,18 @@
-create table centro_costos
+create table tp.centro_costos
 (
 	id_CC int auto_increment
 		primary key,
 	CC_Descripcion varchar(255) null
 );
 
-create table centro_facturacion
+create table tp.centro_facturacion
 (
 	id_CF int auto_increment
 		primary key,
 	CF_Descripcion varchar(255) null
 );
 
-create table cliente
+create table tp.cliente
 (
 	id int auto_increment
 		primary key,
@@ -21,12 +21,12 @@ create table cliente
 	id_cc int null,
 	id_cf int null,
 	constraint cliente_centro_costos_id_CC_fk
-		foreign key (id_cc) references centro_costos (id_CC),
+		foreign key (id_cc) references tp.centro_costos (id_CC),
 	constraint cliente_centro_facturacion_id_CF_fk
-		foreign key (id_cf) references centro_facturacion (id_CF)
+		foreign key (id_cf) references tp.centro_facturacion (id_CF)
 );
 
-create table empleado
+create table tp.empleado
 (
 	id int,
 	nombre varchar(200) null,
@@ -38,11 +38,11 @@ create table empleado
 );
 
 create index empleado_id_legajo_index
-	on empleado (id, legajo);
+	on tp.empleado (id, legajo);
 
-alter table empleado modify id int auto_increment;
+alter table tp.empleado modify id int auto_increment;
 
-create table liquidacion_mensual
+create table tp.liquidacion_mensual
 (
 	id int auto_increment
 		primary key,
@@ -54,9 +54,9 @@ create table liquidacion_mensual
 );
 
 create index liquidacion_mensual_clientes_id_fk
-	on liquidacion_mensual (cliente_id);
+	on tp.liquidacion_mensual (cliente_id);
 
-create table proyecto
+create table tp.proyecto
 (
 	proyecto_id int auto_increment
 		primary key,
@@ -65,29 +65,29 @@ create table proyecto
 	estado char default 'A' null,
 	horas_asignadas_totales decimal(5,2) null,
 	constraint proyecto_cliente_id_fk
-		foreign key (cliente_id) references cliente (id)
+		foreign key (cliente_id) references tp.cliente (id)
 );
 
-create table roles
+create table tp.roles
 (
 	id int auto_increment
 		primary key,
 	descripcion_rol varchar(255) null
 );
 
-create table roles_empleados
+create table tp.roles_empleados
 (
 	id_rol int null,
 	legajo_empleado int null,
 	constraint roles_empleados_pk
 		unique (id_rol, legajo_empleado),
 	constraint roles_empleados_empleado_legajo_fk
-		foreign key (legajo_empleado) references empleado (legajo),
+		foreign key (legajo_empleado) references tp.empleado (legajo),
 	constraint roles_empleados_roles_id_fk
-		foreign key (id_rol) references roles (id)
+		foreign key (id_rol) references tp.roles (id)
 );
 
-create table tareas
+create table tp.tareas
 (
 	id int auto_increment
 		primary key,
@@ -98,12 +98,12 @@ create table tareas
 	fini date null,
 	ffin datetime null,
 	constraint tareas_empleado_legajo_fk
-		foreign key (legajo_id) references empleado (legajo),
+		foreign key (legajo_id) references tp.empleado (legajo),
 	constraint tareas_proyecto_proyecto_id_fk
-		foreign key (proyecto_id) references proyecto (proyecto_id)
+		foreign key (proyecto_id) references tp.proyecto (proyecto_id)
 );
 
-create table rendicion
+create table tp.rendicion
 (
 	id int auto_increment
 		primary key,
@@ -112,18 +112,19 @@ create table rendicion
 	tarea_id int null,
 	fecharendicion datetime null,
 	constraint rendicion_tareas_id_fk
-		foreign key (tarea_id) references tareas (id)
+		foreign key (tarea_id) references tp.tareas (id)
 );
 
-create table tarea_rendicion
+create table tp.tarea_rendicion
 (
 	id_tarea int null,
 	id_rendicion int null,
 	constraint tarea_rendicion_rendicion_id_fk
-		foreign key (id_rendicion) references rendicion (id),
+		foreign key (id_rendicion) references tp.rendicion (id),
 	constraint tarea_rendicion_tareas_id_fk
-		foreign key (id_tarea) references tareas (id)
+		foreign key (id_tarea) references tp.tareas (id)
 );
 
 create index tarea_rendicion_id_tarea_id_rendicion_index
-	on tarea_rendicion (id_tarea, id_rendicion);
+	on tp.tarea_rendicion (id_tarea, id_rendicion);
+
