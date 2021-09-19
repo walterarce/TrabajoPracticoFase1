@@ -103,20 +103,14 @@ begin
                             join tarea_rendicion tr on r.id = tr.id_rendicion
                             join tareas t on t.id = r.tarea_id
                             where r.id=in_id_rendicion);
-    SET  @mesliquidacion  = (select MONTH(fecha) from liquidacion_mensual where cliente_id=@cliente_liq  and proyecto_id =@proyecto_liq  );
-    SET @horasliqmensualactual = (select horas from liquidacion_mensual where cliente_id=@cliente_liq and proyecto_id =@proyecto_liq);
+    SET  @mesliquidacion  = (select MONTH(fecha) from liquidacion_mensual where cliente_id=@cliente_liq  and proyecto_id =@proyecto_liq and ajuste='O' );
+    SET @horasliqmensualactual = (select horas from liquidacion_mensual where cliente_id=@cliente_liq and proyecto_id =@proyecto_liq and ajuste='O');
     IF in_horas > @valoractual then
-        IF @mesrendicion = @mesliquidacion then
-            UPDATE liquidacion_mensual
-                    SET horas = (@horasliqmensualactual+in_horas)
-            WHERE cliente_id=@cliente_liq and proyecto_id=@proyecto_liq;
-        end if;
-    else
-        IF @mesrendicion = @mesliquidacion then
-            UPDATE liquidacion_mensual
-                    SET horas = (@horasliqmensualactual-in_horas)
-            WHERE cliente_id=@cliente_liq and proyecto_id=@proyecto_liq;
-        end if;
+        INSERT INTO liquidacion_mensual (cliente_id, proyecto_id, descripcion, horas, fecha,ajuste)
+           VALUES (@cliente_liq,@proyecto_liq,'AJUSTE Positivo',in_horas,now(),'A');
+    elseif in_horas < @valoractual then
+       INSERT INTO liquidacion_mensual (cliente_id, proyecto_id, descripcion, horas, fecha, ajuste)
+           VALUES (@cliente_liq,@proyecto_liq,'AJUSTE Negativo',-in_horas,now(),'A');
     end if;
     UPDATE rendicion set horas = in_horas
         WHERE id=in_id_rendicion;
