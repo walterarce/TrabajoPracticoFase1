@@ -7,3 +7,7 @@ call alta_rol('Analista Full Stack');
 call asignar_rol_empleado(1220,1);
 call alta_tarea('Analisis implementacion React',1220,'A',1);
 call rendicion_horas_diaria(4.3,1)
+
+call actualizar_tarea(null,null,'','C',null,1)
+
+call alta_tarea('Implementar cambios CSS',1220,null,1)
