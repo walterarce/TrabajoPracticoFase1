@@ -5,9 +5,7 @@ call alta_proyecto('Formulario de clientes',1,200);
 call alta_empleado('Geronimo', 'Perez',1220,25187617,'D');
 call alta_rol('Analista Full Stack');
 call asignar_rol_empleado(1220,1);
-call alta_tarea('Analisis implementacion React',1220,'A',1);
+call alta_tarea('Analisis implementacion React',1220,1);
 call rendicion_horas_diaria(4.3,1)
-
 call actualizar_tarea(null,null,'','C',null,1)
-
 call alta_tarea('Implementar cambios CSS',1220,null,1)
