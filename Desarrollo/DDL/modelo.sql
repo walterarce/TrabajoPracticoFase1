@@ -42,6 +42,14 @@ create index empleado_id_legajo_index
 
 alter table tp.empleado modify id int auto_increment;
 
+create table tp.feriados
+(
+	id int auto_increment
+		primary key,
+	fechaferiado date null,
+	descripcion varchar(255) null
+);
+
 create table tp.liquidacion_mensual
 (
 	id int auto_increment
@@ -50,7 +58,8 @@ create table tp.liquidacion_mensual
 	proyecto_id int null,
 	descripcion varchar(255) null,
 	horas decimal(5,2) null,
-	fecha datetime null
+	fecha datetime null,
+	ajuste char default 'O' null
 );
 
 create index liquidacion_mensual_clientes_id_fk
@@ -91,10 +100,10 @@ create table tp.tareas
 (
 	id int auto_increment
 		primary key,
-	descripcion varchar(255) null,
-	legajo_id int null,
+	descripcion varchar(255) not null,
+	legajo_id int not null,
 	estado char default 'A' null,
-	proyecto_id int null,
+	proyecto_id int not null,
 	fini date null,
 	ffin datetime null,
 	constraint tareas_empleado_legajo_fk
@@ -110,7 +119,7 @@ create table tp.rendicion
 	horas decimal(5,2) null,
 	tipo_rendicion char null,
 	tarea_id int null,
-	fecharendicion datetime null,
+	fecharendicion date null,
 	constraint rendicion_tareas_id_fk
 		foreign key (tarea_id) references tp.tareas (id)
 );
