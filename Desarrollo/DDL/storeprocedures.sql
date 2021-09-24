@@ -9,6 +9,19 @@ BEGIN
         end if;
 END;
 
+create definer = root@localhost function tp.HABILESDELMES(target_date date) returns int
+BEGIN
+  DECLARE v_feriados INT DEFAULT 0;
+  DECLARE incremento INT DEFAULT 0;
+         while incremento < DAY(LAST_DAY(target_date)) do
+            IF (ESFERIADO(DATE_SUB(target_date, INTERVAL incremento DAY))) then
+                SET v_feriados= v_feriados+1;
+            end if;
+         SET incremento = incremento + 1;
+        end while;
+  RETURN  DAY(LAST_DAY(target_date)) - v_feriados;
+END;
+
 create definer = root@localhost procedure tp.actualizar_tarea(IN in_proyecto int, IN in_legajo int, IN in_descripcion varchar(255), IN in_estado char, IN in_fini datetime, IN in_idtarea int)
 begin
     SET @proyecto_id = in_proyecto;
@@ -76,7 +89,7 @@ end;
 
 create definer = root@localhost procedure tp.alta_empleado(IN in_nombre varchar(200), IN in_apellido varchar(200), IN in_legajo int, IN in_dni int, IN in_tipo_rendicion char)
 begin
-    INSERT INTO empleado(nombre, apellido, legajo, dni, tipo_rendicion) 
+    INSERT INTO empleado(nombre, apellido, legajo, dni, tipo_rendicion)
       values (in_nombre,in_apellido,in_legajo,in_dni, in_tipo_rendicion);
 end;
 
@@ -142,7 +155,7 @@ begin
         join empleado e on e.legajo = t.legajo_id
     WHERE r.tarea_id = v_in_tarea_id AND r.fecharendicion =infecha);
     #solo si esta abierta, es de carga diaria, no es feriado o fin de semana , no es a futuro y no hay duplicado
-    IF (@v_estado = 'A' 
+    IF (@v_estado = 'A'
             AND (!ESFERIADO(infecha))
             AND infecha <=NOW() AND @NoexisteDuplicado=0
     ) then
@@ -151,31 +164,28 @@ begin
       SELECT LAST_INSERT_ID() INTO @rendicion_id;
       INSERT INTO tarea_rendicion(id_tarea, id_rendicion)
        values (v_in_tarea_id,@rendicion_id);
-    else
-        select 'Lamentablemente no se pudo cargar';
     end if;
 
 end;
 
-create definer = root@localhost procedure tp.rendicion_horas_mensual(IN in_horas decimal(5,2), IN v_in_tarea_id int)
+create definer = root@localhost procedure tp.rendicion_horas_mensual(IN in_horas decimal(5,2), IN v_in_tarea_id int, IN v_fecha date)
 begin
-    SET @v_estado = (select estado from tareas where id=v_in_tarea_id);
-    SET @v_tiporendicionempleado = (select e.tipo_rendicion from tareas t join proyecto p on p.proyecto_id = t.proyecto_id
-join empleado e on e.legajo = t.legajo_id where t.id=v_in_tarea_id);
-    IF (@v_estado = 'A' AND @v_tiporendicionempleado ='M') then
-      INSERT INTO rendicion(horas,tipo_rendicion, tarea_id, fecharendicion)
-      values (in_horas,'M',v_in_tarea_id,now());
-      SELECT LAST_INSERT_ID() INTO @rendicion_id;
-      INSERT INTO tarea_rendicion(id_tarea, id_rendicion)
-       values (v_in_tarea_id,@rendicion_id);
+    DECLARE incremento INT DEFAULT 0;
+    IF (in_horas<=160 and DAY(v_fecha)=DAY(LAST_DAY(v_fecha))) then
+          while incremento < DAY(LAST_DAY(v_fecha)) do
+            if (MONTH(DATE_SUB(v_fecha, INTERVAL incremento DAY)) = MONTH(v_fecha)) then
+              call rendicion_horas_diaria((in_horas/HABILESDELMES(v_fecha)),v_in_tarea_id,DATE_SUB(v_fecha, INTERVAL incremento DAY));
+            end if;
+            SET incremento = incremento + 1;
+          end while;
+           
     end if;
-
 end;
 
 create definer = root@localhost procedure tp.rendicion_horas_semanal(IN in_horas decimal(5,2), IN v_in_tarea_id int, IN v_fecha date)
 begin
     DECLARE incremento INT DEFAULT 0;
-    IF (DAYNAME(v_fecha) = 'Friday') then
+    IF (DAYNAME(v_fecha) = 'Friday' and in_horas<=40) then
           while incremento < 5 do
             call rendicion_horas_diaria((in_horas/5),v_in_tarea_id,DATE_SUB(v_fecha, INTERVAL incremento DAY));
             SET incremento = incremento + 1;
